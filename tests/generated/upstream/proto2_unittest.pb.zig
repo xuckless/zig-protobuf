@@ -251,6 +251,9 @@ pub const TestMessageWithCustomOptions = struct {
     oneof_field: ?i32 = null,
     map_field: std.ArrayList(TestMessageWithCustomOptions.MapFieldEntry) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A test message with custom options at all possible locations (and also some\nregular options, to make sure they interact nicely).";
+
     pub const _desc_table = .{
         .field1 = fd(1, .{ .scalar = .string }),
         .oneof_field = fd(2, .{ .scalar = .int32 }),
@@ -448,6 +451,9 @@ pub const TestMessageWithCustomOptions = struct {
 /// A test RPC service with custom options at all possible locations (and also
 /// some regular options, to make sure they interact nicely).
 pub const CustomOptionFooRequest = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A test RPC service with custom options at all possible locations (and also\nsome regular options, to make sure they interact nicely).";
+
     pub const _desc_table = .{};
 
     /// Encodes the message to the writer
@@ -2061,6 +2067,9 @@ pub const ComplexOpt6 = struct {
 
 /// Note that we try various different ways of naming the same extension.
 pub const VariousComplexOptions = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Note that we try various different ways of naming the same extension.";
+
     pub const _desc_table = .{};
 
     /// Options of the message (`google.protobuf.MessageOptions`).
@@ -2346,6 +2355,17 @@ pub const Aggregate = struct {
     mset: ?AggregateMessageSet = null,
     any: ?google_protobuf.Any = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A helper type used to test aggregate option parsing";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .sub = "A nested object",
+        .file = "To test the parsing of extensions inside aggregate values",
+        .mset = "An embedded message set",
+        .any = "An any",
+    };
+
     pub const _desc_table = .{
         .i = fd(1, .{ .scalar = .int32 }),
         .s = fd(2, .{ .scalar = .string }),
@@ -2511,6 +2531,9 @@ pub const AggregateMessage = struct {
 
 /// Test custom options for nested type.
 pub const NestedOptionType = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test custom options for nested type.";
+
     pub const _desc_table = .{};
 
     pub const NestedEnum = enum(i32) {
@@ -2688,6 +2711,9 @@ pub const NestedOptionType = struct {
 pub const OldOptionType = struct {
     value: OldOptionType.TestEnum,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Custom message option that has a required enum field.\nWARNING: this is strongly discouraged!";
+
     pub const _desc_table = .{
         .value = fdf(1, .@"enum", .{ .legacy_required = true }),
     };
@@ -2763,6 +2789,9 @@ pub const OldOptionType = struct {
 pub const NewOptionType = struct {
     value: NewOptionType.TestEnum,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Updated version of the custom option above.";
+
     pub const _desc_table = .{
         .value = fdf(1, .@"enum", .{ .legacy_required = true }),
     };
@@ -2837,6 +2866,9 @@ pub const NewOptionType = struct {
 
 /// Test message using the "required_enum_opt" option defined above.
 pub const TestMessageWithRequiredEnumOption = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test message using the \"required_enum_opt\" option defined above.";
+
     pub const _desc_table = .{};
 
     /// Options of the message (`google.protobuf.MessageOptions`).
@@ -3101,6 +3133,9 @@ pub const OptionsMessage = struct {
     plain_field: ?i32 = null,
     runtime_retention_field: ?i32 = null,
     source_retention_field: ?i32 = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Retention attributes set on fields nested within a message";
 
     pub const _desc_table = .{
         .plain_field = fd(1, .{ .scalar = .int32 }),

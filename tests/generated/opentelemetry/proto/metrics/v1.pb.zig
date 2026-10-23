@@ -18,6 +18,16 @@ pub const AggregationTemporality = enum(i32) {
     AGGREGATION_TEMPORALITY_DELTA = 1,
     AGGREGATION_TEMPORALITY_CUMULATIVE = 2,
     _,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "AggregationTemporality defines how a metric aggregator reports aggregated\nvalues. It describes how those values relate to the time interval over\nwhich they are aggregated.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _value_docs = .{
+        .AGGREGATION_TEMPORALITY_UNSPECIFIED = "UNSPECIFIED is the default AggregationTemporality, it MUST not be used.",
+        .AGGREGATION_TEMPORALITY_DELTA = "DELTA is an AggregationTemporality for a metric aggregator which reports\nchanges since last report time. Successive metrics contain aggregation of\nvalues from continuous and non-overlapping intervals.\n\nThe values for a DELTA metric are based only on the time interval\nassociated with one measurement cycle. There is no dependency on\nprevious measurements like is the case for CUMULATIVE metrics.\n\nFor example, consider a system measuring the number of requests that\nit receives and reports the sum of these requests every second as a\nDELTA metric:\n\n1. The system starts receiving at time=t_0.\n2. A request is received, the system measures 1 request.\n3. A request is received, the system measures 1 request.\n4. A request is received, the system measures 1 request.\n5. The 1 second collection cycle ends. A metric is exported for the\nnumber of requests received over the interval of time t_0 to\nt_0+1 with a value of 3.\n6. A request is received, the system measures 1 request.\n7. A request is received, the system measures 1 request.\n8. The 1 second collection cycle ends. A metric is exported for the\nnumber of requests received over the interval of time t_0+1 to\nt_0+2 with a value of 2.",
+        .AGGREGATION_TEMPORALITY_CUMULATIVE = "CUMULATIVE is an AggregationTemporality for a metric aggregator which\nreports changes since a fixed start time. This means that current values\nof a CUMULATIVE metric depend on all previous measurements since the\nstart time. Because of this, the sender is required to retain this state\nin some form. If this state is lost or invalidated, the CUMULATIVE metric\nvalues MUST be reset and a new fixed start time following the last\nreported measurement time sent MUST be used.\n\nFor example, consider a system measuring the number of requests that\nit receives and reports the sum of these requests every second as a\nCUMULATIVE metric:\n\n1. The system starts receiving at time=t_0.\n2. A request is received, the system measures 1 request.\n3. A request is received, the system measures 1 request.\n4. A request is received, the system measures 1 request.\n5. The 1 second collection cycle ends. A metric is exported for the\nnumber of requests received over the interval of time t_0 to\nt_0+1 with a value of 3.\n6. A request is received, the system measures 1 request.\n7. A request is received, the system measures 1 request.\n8. The 1 second collection cycle ends. A metric is exported for the\nnumber of requests received over the interval of time t_0 to\nt_0+2 with a value of 5.\n9. The system experiences a fault and loses state.\n10. The system recovers and resumes receiving at time=t_1.\n11. A request is received, the system measures 1 request.\n12. The 1 second collection cycle ends. A metric is exported for the\nnumber of requests received over the interval of time t_1 to\nt_0+1 with a value of 1.\n\nNote: Even though, when reporting changes since last report time, using\nCUMULATIVE is valid, it is not recommended. This may cause problems for\nsystems that do not use start_time to determine when the aggregation\nvalue was reset (e.g. Prometheus).",
+    };
 };
 
 /// DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a
@@ -30,6 +40,15 @@ pub const DataPointFlags = enum(i32) {
     DATA_POINT_FLAGS_DO_NOT_USE = 0,
     DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK = 1,
     _,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "DataPointFlags is defined as a protobuf 'uint32' type and is to be used as a\nbit-field representing 32 distinct boolean flags.  Each flag defined in this\nenum is a bit-mask.  To test the presence of a single flag in the flags of\na data point, for example, use an expression like:\n\n(point.flags & DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK) == DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _value_docs = .{
+        .DATA_POINT_FLAGS_DO_NOT_USE = "The zero value for the enum. Should not be used for comparisons.\nInstead use bitwise \"and\" with the appropriate mask as shown above.",
+        .DATA_POINT_FLAGS_NO_RECORDED_VALUE_MASK = "This DataPoint is valid but has no recorded value.  This value\nSHOULD be used to reflect explicitly missing data in a series, as\nfor an equivalent to the Prometheus \"staleness marker\".",
+    };
 };
 
 /// MetricsData represents the metrics data that can be stored in a persistent
@@ -62,6 +81,14 @@ pub const DataPointFlags = enum(i32) {
 /// as well.
 pub const MetricsData = struct {
     resource_metrics: std.ArrayList(ResourceMetrics) = .empty,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "MetricsData represents the metrics data that can be stored in a persistent\nstorage, OR can be embedded by other protocols that transfer OTLP metrics\ndata but do not implement the OTLP protocol.\n\nMetricsData\n└─── ResourceMetrics\n├── Resource\n├── SchemaURL\n└── ScopeMetrics\n├── Scope\n├── SchemaURL\n└── Metric\n├── Name\n├── Description\n├── Unit\n└── data\n├── Gauge\n├── Sum\n├── Histogram\n├── ExponentialHistogram\n└── Summary\n\nThe main difference between this message and collector protocol is that\nin this message there will not be any \"control\" or \"metadata\" specific to\nOTLP protocol.\n\nWhen new fields are added into this message, the OTLP request MUST be updated\nas well.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .resource_metrics = "An array of ResourceMetrics.\nFor data coming from a single resource this array will typically contain\none element. Intermediary nodes that receive data from multiple origins\ntypically batch the data before forwarding further and in that case this\narray will contain multiple elements.",
+    };
 
     pub const _desc_table = .{
         .resource_metrics = fd(1, .{ .repeated = .submessage }),
@@ -135,6 +162,16 @@ pub const ResourceMetrics = struct {
     resource: ?opentelemetry_proto_resource_v1.Resource = null,
     scope_metrics: std.ArrayList(ScopeMetrics) = .empty,
     schema_url: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A collection of ScopeMetrics from a Resource.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .resource = "The resource for the metrics in this message.\nIf this field is not set then no resource info is known.",
+        .scope_metrics = "A list of metrics that originate from a resource.",
+        .schema_url = "The Schema URL, if known. This is the identifier of the Schema that the resource data\nis recorded in. To learn more about Schema URL see\nhttps://opentelemetry.io/docs/specs/otel/schemas/#schema-url\nThis schema_url applies to the data in the \"resource\" field. It does not apply\nto the data in the \"scope_metrics\" field which have their own schema_url field.",
+    };
 
     pub const _desc_table = .{
         .resource = fd(1, .submessage),
@@ -210,6 +247,16 @@ pub const ScopeMetrics = struct {
     scope: ?opentelemetry_proto_common_v1.InstrumentationScope = null,
     metrics: std.ArrayList(Metric) = .empty,
     schema_url: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A collection of Metrics produced by an Scope.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .scope = "The instrumentation scope information for the metrics in this message.\nSemantically when InstrumentationScope isn't set, it is equivalent with\nan empty instrumentation scope name (unknown).",
+        .metrics = "A list of metrics that originate from an instrumentation library.",
+        .schema_url = "The Schema URL, if known. This is the identifier of the Schema that the metric data\nis recorded in. To learn more about Schema URL see\nhttps://opentelemetry.io/docs/specs/otel/schemas/#schema-url\nThis schema_url applies to all metrics in the \"metrics\" field.",
+    };
 
     pub const _desc_table = .{
         .scope = fd(1, .submessage),
@@ -393,6 +440,17 @@ pub const Metric = struct {
         };
     };
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Defines a Metric which has one or more timeseries.  The following is a\nbrief summary of the Metric data model.  For more details, see:\n\nhttps://github.com/open-telemetry/opentelemetry-specification/blob/main/specification/metrics/data-model.md\n\nThe data model and relation between entities is shown in the\ndiagram below. Here, \"DataPoint\" is the term used to refer to any\none of the specific data point value types, and \"points\" is the term used\nto refer to any one of the lists of points contained in the Metric.\n\n- Metric is composed of a metadata and data.\n- Metadata part contains a name, description, unit.\n- Data is one of the possible types (Sum, Gauge, Histogram, Summary).\n- DataPoint contains timestamps, attributes, and one of the possible value type\nfields.\n\nMetric\n+------------+\n|name        |\n|description |\n|unit        |     +------------------------------------+\n|data        |---> |Gauge, Sum, Histogram, Summary, ... |\n+------------+     +------------------------------------+\n\nData [One of Gauge, Sum, Histogram, Summary, ...]\n+-----------+\n|...        |  // Metadata about the Data.\n|points     |--+\n+-----------+  |\n|      +---------------------------+\n|      |DataPoint 1                |\nv      |+------+------+   +------+ |\n+-----+   ||label |label |...|label | |\n|  1  |-->||value1|value2|...|valueN| |\n+-----+   |+------+------+   +------+ |\n|  .  |   |+-----+                    |\n|  .  |   ||value|                    |\n|  .  |   |+-----+                    |\n|  .  |   +---------------------------+\n|  .  |                   .\n|  .  |                   .\n|  .  |                   .\n|  .  |   +---------------------------+\n|  .  |   |DataPoint M                |\n+-----+   |+------+------+   +------+ |\n|  M  |-->||label |label |...|label | |\n+-----+   ||value1|value2|...|valueN| |\n|+------+------+   +------+ |\n|+-----+                    |\n||value|                    |\n|+-----+                    |\n+---------------------------+\n\nEach distinct type of DataPoint represents the output of a specific\naggregation function, the result of applying the DataPoint's\nassociated function of to one or more measurements.\n\nAll DataPoint types have three common fields:\n- Attributes includes key-value pairs associated with the data point\n- TimeUnixNano is required, set to the end time of the aggregation\n- StartTimeUnixNano is optional, but strongly encouraged for DataPoints\nhaving an AggregationTemporality field, as discussed below.\n\nBoth TimeUnixNano and StartTimeUnixNano values are expressed as\nUNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.\n\n# TimeUnixNano\n\nThis field is required, having consistent interpretation across\nDataPoint types.  TimeUnixNano is the moment corresponding to when\nthe data point's aggregate value was captured.\n\nData points with the 0 value for TimeUnixNano SHOULD be rejected\nby consumers.\n\n# StartTimeUnixNano\n\nStartTimeUnixNano in general allows detecting when a sequence of\nobservations is unbroken.  This field indicates to consumers the\nstart time for points with cumulative and delta\nAggregationTemporality, and it should be included whenever possible\nto support correct rate calculation.  Although it may be omitted\nwhen the start time is truly unknown, setting StartTimeUnixNano is\nstrongly encouraged.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .name = "name of the metric.",
+        .description = "description of the metric, which can be used in documentation.",
+        .unit = "unit in which the metric value is reported. Follows the format\ndescribed by http://unitsofmeasure.org/ucum.html.",
+        .metadata = "Additional metadata attributes that describe the metric. [Optional].\nAttributes are non-identifying.\nConsumers SHOULD NOT need to be aware of these attributes.\nThese attributes MAY be used to encode information allowing\nfor lossless roundtrip translation to / from another data model.\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+    };
+
     pub const _desc_table = .{
         .name = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),
         .description = fdf(2, .{ .scalar = .string }, .{ .utf8_validation = .verify }),
@@ -476,6 +534,9 @@ pub const Metric = struct {
 pub const Gauge = struct {
     data_points: std.ArrayList(NumberDataPoint) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Gauge represents the type of a scalar metric that always exports the\n\"current value\" for every data point. It should be used for an \"unknown\"\naggregation.\n\nA Gauge does not support different aggregation temporalities. Given the\naggregation is unknown, points cannot be combined using the same\naggregation, regardless of aggregation temporalities. Therefore,\nAggregationTemporality is not included. Consequently, this also means\n\"StartTimeUnixNano\" is ignored for all data points.";
+
     pub const _desc_table = .{
         .data_points = fd(1, .{ .repeated = .submessage }),
     };
@@ -549,6 +610,15 @@ pub const Sum = struct {
     data_points: std.ArrayList(NumberDataPoint) = .empty,
     aggregation_temporality: AggregationTemporality = @fromBackingInt(0),
     is_monotonic: bool = false,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Sum represents the type of a scalar metric that is calculated as a sum of all\nreported measurements over a time interval.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .aggregation_temporality = "aggregation_temporality describes if the aggregator reports delta changes\nsince last report time, or cumulative changes since a fixed start time.",
+        .is_monotonic = "If \"true\" means that the sum is monotonic.",
+    };
 
     pub const _desc_table = .{
         .data_points = fd(1, .{ .repeated = .submessage }),
@@ -625,6 +695,14 @@ pub const Histogram = struct {
     data_points: std.ArrayList(HistogramDataPoint) = .empty,
     aggregation_temporality: AggregationTemporality = @fromBackingInt(0),
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Histogram represents the type of a metric that is calculated by aggregating\nas a Histogram of all reported measurements over a time interval.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .aggregation_temporality = "aggregation_temporality describes if the aggregator reports delta changes\nsince last report time, or cumulative changes since a fixed start time.",
+    };
+
     pub const _desc_table = .{
         .data_points = fd(1, .{ .repeated = .submessage }),
         .aggregation_temporality = fd(2, .@"enum"),
@@ -698,6 +776,14 @@ pub const Histogram = struct {
 pub const ExponentialHistogram = struct {
     data_points: std.ArrayList(ExponentialHistogramDataPoint) = .empty,
     aggregation_temporality: AggregationTemporality = @fromBackingInt(0),
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "ExponentialHistogram represents the type of a metric that is calculated by aggregating\nas a ExponentialHistogram of all reported double measurements over a time interval.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .aggregation_temporality = "aggregation_temporality describes if the aggregator reports delta changes\nsince last report time, or cumulative changes since a fixed start time.",
+    };
 
     pub const _desc_table = .{
         .data_points = fd(1, .{ .repeated = .submessage }),
@@ -775,6 +861,9 @@ pub const ExponentialHistogram = struct {
 /// recommended for new applications.
 pub const Summary = struct {
     data_points: std.ArrayList(SummaryDataPoint) = .empty,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Summary metric data are used to convey quantile summaries,\na Prometheus (see: https://prometheus.io/docs/concepts/metric_types/#summary)\nand OpenMetrics (see: https://github.com/OpenObservability/OpenMetrics/blob/4dbf6075567ab43296eed941037c12951faafb92/protos/prometheus.proto#L45)\ndata type. These data points cannot always be merged in a meaningful way.\nWhile they can be useful in some applications, histogram data points are\nrecommended for new applications.";
 
     pub const _desc_table = .{
         .data_points = fd(1, .{ .repeated = .submessage }),
@@ -864,6 +953,18 @@ pub const NumberDataPoint = struct {
             .as_double = fd(4, .{ .scalar = .double }),
             .as_int = fd(6, .{ .scalar = .sfixed64 }),
         };
+    };
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "NumberDataPoint is a single data point in a timeseries that describes the\ntime-varying scalar value of a metric.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .attributes = "The set of key/value pairs that uniquely identify the timeseries from\nwhere this point belongs. The list may be empty (may contain 0 elements).\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+        .start_time_unix_nano = "StartTimeUnixNano is optional but strongly encouraged, see the\nthe detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .time_unix_nano = "TimeUnixNano is required, see the detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .exemplars = "(Optional) List of exemplars collected from\nmeasurements that were used to form the data point",
+        .flags = "Flags that apply to this specific data point.  See DataPointFlags\nfor the available flags and their meaning.",
     };
 
     pub const _desc_table = .{
@@ -960,6 +1061,24 @@ pub const HistogramDataPoint = struct {
     flags: u32 = 0,
     min: ?f64 = null,
     max: ?f64 = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "HistogramDataPoint is a single data point in a timeseries that describes the\ntime-varying values of a Histogram. A Histogram contains summary statistics\nfor a population of values, it may optionally contain the distribution of\nthose values across a set of buckets.\n\nIf the histogram contains the distribution of values, then both\n\"explicit_bounds\" and \"bucket counts\" fields must be defined.\nIf the histogram does not contain the distribution of values, then both\n\"explicit_bounds\" and \"bucket_counts\" must be omitted and only \"count\" and\n\"sum\" are known.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .attributes = "The set of key/value pairs that uniquely identify the timeseries from\nwhere this point belongs. The list may be empty (may contain 0 elements).\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+        .start_time_unix_nano = "StartTimeUnixNano is optional but strongly encouraged, see the\nthe detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .time_unix_nano = "TimeUnixNano is required, see the detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .count = "count is the number of values in the population. Must be non-negative. This\nvalue must be equal to the sum of the \"count\" fields in buckets if a\nhistogram is provided.",
+        .sum = "sum of the values in the population. If count is zero then this field\nmust be zero.\n\nNote: Sum should only be filled out when measuring non-negative discrete\nevents, and is assumed to be monotonic over the values of these events.\nNegative events *can* be recorded, but sum should not be filled out when\ndoing so.  This is specifically to enforce compatibility w/ OpenMetrics,\nsee: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram",
+        .bucket_counts = "bucket_counts is an optional field contains the count values of histogram\nfor each bucket.\n\nThe sum of the bucket_counts must equal the value in the count field.\n\nThe number of elements in bucket_counts array must be by one greater than\nthe number of elements in explicit_bounds array.",
+        .explicit_bounds = "explicit_bounds specifies buckets with explicitly defined bounds for values.\n\nThe boundaries for bucket at index i are:\n\n(-infinity, explicit_bounds[i]] for i == 0\n(explicit_bounds[i-1], explicit_bounds[i]] for 0 < i < size(explicit_bounds)\n(explicit_bounds[i-1], +infinity) for i == size(explicit_bounds)\n\nThe values in the explicit_bounds array must be strictly increasing.\n\nHistogram buckets are inclusive of their upper boundary, except the last\nbucket where the boundary is at infinity. This format is intentionally\ncompatible with the OpenMetrics histogram definition.",
+        .exemplars = "(Optional) List of exemplars collected from\nmeasurements that were used to form the data point",
+        .flags = "Flags that apply to this specific data point.  See DataPointFlags\nfor the available flags and their meaning.",
+        .min = "min is the minimum value over (start_time, end_time].",
+        .max = "max is the maximum value over (start_time, end_time].",
+    };
 
     pub const _desc_table = .{
         .attributes = fd(9, .{ .repeated = .submessage }),
@@ -1058,6 +1177,27 @@ pub const ExponentialHistogramDataPoint = struct {
     max: ?f64 = null,
     zero_threshold: f64 = 0,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "ExponentialHistogramDataPoint is a single data point in a timeseries that describes the\ntime-varying values of a ExponentialHistogram of double values. A ExponentialHistogram contains\nsummary statistics for a population of values, it may optionally contain the\ndistribution of those values across a set of buckets.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .attributes = "The set of key/value pairs that uniquely identify the timeseries from\nwhere this point belongs. The list may be empty (may contain 0 elements).\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+        .start_time_unix_nano = "StartTimeUnixNano is optional but strongly encouraged, see the\nthe detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .time_unix_nano = "TimeUnixNano is required, see the detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .count = "count is the number of values in the population. Must be\nnon-negative. This value must be equal to the sum of the \"bucket_counts\"\nvalues in the positive and negative Buckets plus the \"zero_count\" field.",
+        .sum = "sum of the values in the population. If count is zero then this field\nmust be zero.\n\nNote: Sum should only be filled out when measuring non-negative discrete\nevents, and is assumed to be monotonic over the values of these events.\nNegative events *can* be recorded, but sum should not be filled out when\ndoing so.  This is specifically to enforce compatibility w/ OpenMetrics,\nsee: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#histogram",
+        .scale = "scale describes the resolution of the histogram.  Boundaries are\nlocated at powers of the base, where:\n\nbase = (2^(2^-scale))\n\nThe histogram bucket identified by `index`, a signed integer,\ncontains values that are greater than (base^index) and\nless than or equal to (base^(index+1)).\n\nThe positive and negative ranges of the histogram are expressed\nseparately.  Negative values are mapped by their absolute value\ninto the negative range using the same scale as the positive range.\n\nscale is not restricted by the protocol, as the permissible\nvalues depend on the range of the data.",
+        .zero_count = "zero_count is the count of values that are either exactly zero or\nwithin the region considered zero by the instrumentation at the\ntolerated degree of precision.  This bucket stores values that\ncannot be expressed using the standard exponential formula as\nwell as values that have been rounded to zero.\n\nImplementations MAY consider the zero bucket to have probability\nmass equal to (zero_count / count).",
+        .positive = "positive carries the positive range of exponential bucket counts.",
+        .negative = "negative carries the negative range of exponential bucket counts.",
+        .flags = "Flags that apply to this specific data point.  See DataPointFlags\nfor the available flags and their meaning.",
+        .exemplars = "(Optional) List of exemplars collected from\nmeasurements that were used to form the data point",
+        .min = "min is the minimum value over (start_time, end_time].",
+        .max = "max is the maximum value over (start_time, end_time].",
+        .zero_threshold = "ZeroThreshold may be optionally set to convey the width of the zero\nregion. Where the zero region is defined as the closed interval\n[-ZeroThreshold, ZeroThreshold].\nWhen ZeroThreshold is 0, zero count bucket stores values that cannot be\nexpressed using the standard exponential formula as well as values that\nhave been rounded to zero.",
+    };
+
     pub const _desc_table = .{
         .attributes = fd(1, .{ .repeated = .submessage }),
         .start_time_unix_nano = fd(2, .{ .scalar = .fixed64 }),
@@ -1080,6 +1220,15 @@ pub const ExponentialHistogramDataPoint = struct {
     pub const Buckets = struct {
         offset: i32 = 0,
         bucket_counts: std.ArrayList(u64) = .empty,
+
+        /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+        pub const _doc = "Buckets are a set of bucket counts, encoded in a contiguous array\nof counts.";
+
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _field_docs = .{
+            .offset = "Offset is the bucket index of the first entry in the bucket_counts array.\n\nNote: This uses a varint encoding as a simple form of compression.",
+            .bucket_counts = "bucket_counts is an array of count values, where bucket_counts[i] carries\nthe count of the bucket at index (offset+i). bucket_counts[i] is the count\nof values greater than base^(offset+i) and less than or equal to\nbase^(offset+i+1).\n\nNote: By contrast, the explicit HistogramDataPoint uses\nfixed64.  This field is expected to have many buckets,\nespecially zeros, so uint64 has been selected to ensure\nvarint encoding.",
+        };
 
         pub const _desc_table = .{
             .offset = fd(1, .{ .scalar = .sint32 }),
@@ -1223,6 +1372,20 @@ pub const SummaryDataPoint = struct {
     quantile_values: std.ArrayList(SummaryDataPoint.ValueAtQuantile) = .empty,
     flags: u32 = 0,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "SummaryDataPoint is a single data point in a timeseries that describes the\ntime-varying values of a Summary metric.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .attributes = "The set of key/value pairs that uniquely identify the timeseries from\nwhere this point belongs. The list may be empty (may contain 0 elements).\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+        .start_time_unix_nano = "StartTimeUnixNano is optional but strongly encouraged, see the\nthe detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .time_unix_nano = "TimeUnixNano is required, see the detailed comments above Metric.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .count = "count is the number of values in the population. Must be non-negative.",
+        .sum = "sum of the values in the population. If count is zero then this field\nmust be zero.\n\nNote: Sum should only be filled out when measuring non-negative discrete\nevents, and is assumed to be monotonic over the values of these events.\nNegative events *can* be recorded, but sum should not be filled out when\ndoing so.  This is specifically to enforce compatibility w/ OpenMetrics,\nsee: https://github.com/OpenObservability/OpenMetrics/blob/main/specification/OpenMetrics.md#summary",
+        .quantile_values = "(Optional) list of values at different quantiles of the distribution calculated\nfrom the current snapshot. The quantiles must be strictly increasing.",
+        .flags = "Flags that apply to this specific data point.  See DataPointFlags\nfor the available flags and their meaning.",
+    };
+
     pub const _desc_table = .{
         .attributes = fd(7, .{ .repeated = .submessage }),
         .start_time_unix_nano = fd(2, .{ .scalar = .fixed64 }),
@@ -1244,6 +1407,15 @@ pub const SummaryDataPoint = struct {
     pub const ValueAtQuantile = struct {
         quantile: f64 = 0,
         value: f64 = 0,
+
+        /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+        pub const _doc = "Represents the value at a given quantile of a distribution.\n\nTo record Min and Max values following conventions are used:\n- The 1.0 quantile is equivalent to the maximum value observed.\n- The 0.0 quantile is equivalent to the minimum value observed.\n\nSee the following issue for more context:\nhttps://github.com/open-telemetry/opentelemetry-proto/issues/125";
+
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _field_docs = .{
+            .quantile = "The quantile of a distribution. Must be in the interval\n[0.0, 1.0].",
+            .value = "The value at the given quantile of a distribution.\n\nQuantile values must NOT be negative.",
+        };
 
         pub const _desc_table = .{
             .quantile = fd(1, .{ .scalar = .double }),
@@ -1398,6 +1570,17 @@ pub const Exemplar = struct {
             .as_double = fd(3, .{ .scalar = .double }),
             .as_int = fd(6, .{ .scalar = .sfixed64 }),
         };
+    };
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A representation of an exemplar, which is a sample input measurement.\nExemplars also hold information about the environment when the measurement\nwas recorded, for example the span and trace ID of the active span when the\nexemplar was recorded.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .filtered_attributes = "The set of key/value pairs that were filtered out by the aggregator, but\nrecorded alongside the original measurement. Only key/value pairs that were\nfiltered out by the aggregator should be included",
+        .time_unix_nano = "time_unix_nano is the exact time when this exemplar was recorded\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January\n1970.",
+        .span_id = "(Optional) Span ID of the exemplar trace.\nspan_id may be missing if the measurement is not recorded inside a trace\nor if the trace is not sampled.",
+        .trace_id = "(Optional) Trace ID of the exemplar trace.\ntrace_id may be missing if the measurement is not recorded inside a trace\nor if the trace is not sampled.",
     };
 
     pub const _desc_table = .{

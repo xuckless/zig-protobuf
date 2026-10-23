@@ -47,6 +47,9 @@ pub const MyOptions = struct {
     inner: ?MyOptions.Inner = null,
     inners: std.ArrayList(MyOptions.Inner) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Option targets, as in https://protobuf.dev/programming-guides/proto3/#option-targets";
+
     pub const _desc_table = .{
         .file_only_option = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),
         .message_and_enum_option = fd(2, .{ .scalar = .int32 }),
@@ -74,6 +77,9 @@ pub const MyOptions = struct {
     /// Values of every kind, to check how options are decoded.
     pub const Inner = struct {
         x: i32 = 0,
+
+        /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+        pub const _doc = "Values of every kind, to check how options are decoded.";
 
         pub const _desc_table = .{
             .x = fd(1, .{ .scalar = .int32 }),

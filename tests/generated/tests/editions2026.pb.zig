@@ -20,6 +20,11 @@ pub const Defaults = struct {
     child: ?Defaults.Child = null,
     implicit_number: i32 = 0,
 
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .number = "Edition 2026 keeps the edition 2023 defaults for all runtime features.",
+    };
+
     pub const _desc_table = .{
         .number = fd(1, .{ .scalar = .int32 }),
         .text = fdf(2, .{ .scalar = .string }, .{ .utf8_validation = .verify }),

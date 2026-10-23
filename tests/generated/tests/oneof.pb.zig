@@ -333,6 +333,9 @@ pub const Success = struct {
 /// Error caused by S3GC owner changed
 /// client should retry
 pub const NotOwner = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Error caused by S3GC owner changed\nclient should retry";
+
     pub const _desc_table = .{};
 
     /// Encodes the message to the writer
@@ -402,6 +405,9 @@ pub const NotOwner = struct {
 /// request cancel
 pub const Conflict = struct {
     reason: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Error caused by concurrency conflict,\nrequest cancel";
 
     pub const _desc_table = .{
         .reason = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),

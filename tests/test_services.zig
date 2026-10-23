@@ -202,3 +202,10 @@ test "Messages can be encoded and decoded" {
     try testing.expectEqualStrings("test message", decoded.message);
     try testing.expectEqual(@as(i32, 42), decoded.value);
 }
+
+test "comments are emitted as _doc, _field_docs and _method_docs" {
+    try testing.expectEqualStrings("Request message for unary calls", service.UnaryRequest._doc);
+    const V = service.SimpleService(TestServerContext, TestErrorSet);
+    try testing.expectEqualStrings("Performs a simple unary call", V._method_docs.UnaryCall);
+    try testing.expect(std.mem.startsWith(u8, V._doc, "Simple service with unary RPC"));
+}

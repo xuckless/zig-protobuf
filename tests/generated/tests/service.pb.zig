@@ -11,6 +11,9 @@ pub const UnaryRequest = struct {
     message: []const u8 = &.{},
     value: i32 = 0,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Request message for unary calls";
+
     pub const _desc_table = .{
         .message = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),
         .value = fd(2, .{ .scalar = .int32 }),
@@ -84,6 +87,9 @@ pub const UnaryResponse = struct {
     result: []const u8 = &.{},
     success: bool = false,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Response message for unary calls";
+
     pub const _desc_table = .{
         .result = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),
         .success = fd(2, .{ .scalar = .bool }),
@@ -156,6 +162,9 @@ pub const UnaryResponse = struct {
 pub const StreamRequest = struct {
     id: i32 = 0,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Request message for streaming calls";
+
     pub const _desc_table = .{
         .id = fd(1, .{ .scalar = .int32 }),
     };
@@ -226,6 +235,9 @@ pub const StreamRequest = struct {
 /// Response message for streaming calls
 pub const StreamResponse = struct {
     data: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Response message for streaming calls";
 
     pub const _desc_table = .{
         .data = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),
@@ -301,6 +313,14 @@ pub fn SimpleService(comptime UserDataType: type, comptime ErrorSet: type) type 
         pub const package = "tests.service";
         pub const service_name = "SimpleService";
 
+        /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+        pub const _doc = "Simple service with unary RPC\nThis service demonstrates basic request-response pattern";
+
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _method_docs = .{
+            .UnaryCall = "Performs a simple unary call",
+            .AnotherCall = "Another unary call for testing multiple methods",
+        };
         /// Performs a simple unary call
         UnaryCall: *const fn (userdata: *UserDataType, request: UnaryRequest) ErrorSet!UnaryResponse,
         /// Another unary call for testing multiple methods
@@ -314,6 +334,15 @@ pub fn StreamingService(comptime UserDataType: type, comptime ErrorSet: type) ty
         pub const package = "tests.service";
         pub const service_name = "StreamingService";
 
+        /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+        pub const _doc = "Service demonstrating all streaming patterns";
+
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _method_docs = .{
+            .ServerStream = "Server streaming RPC - client sends one request, server sends stream of responses",
+            .ClientStream = "Client streaming RPC - client sends stream of requests, server sends one response",
+            .BidiStream = "Bidirectional streaming RPC - both client and server send streams",
+        };
         /// Server streaming RPC - client sends one request, server sends stream of responses
         ServerStream: *const fn (userdata: *UserDataType, request: StreamRequest, writer_queue: *std.Io.Queue(StreamResponse)) ErrorSet!void,
         /// Client streaming RPC - client sends stream of requests, server sends one response

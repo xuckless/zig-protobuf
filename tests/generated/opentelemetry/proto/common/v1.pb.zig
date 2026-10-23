@@ -40,6 +40,9 @@ pub const AnyValue = struct {
         };
     };
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "AnyValue is used to represent any type of attribute value. AnyValue may contain a\nprimitive value such as a string or integer or it may contain an arbitrary nested\nobject containing arrays, key-value lists and primitives.";
+
     pub const _desc_table = .{
         .value = fd(null, .{ .oneof = value_union }),
     };
@@ -111,6 +114,14 @@ pub const AnyValue = struct {
 /// since oneof in AnyValue does not allow repeated fields.
 pub const ArrayValue = struct {
     values: std.ArrayList(AnyValue) = .empty,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "ArrayValue is a list of AnyValue messages. We need ArrayValue as a message\nsince oneof in AnyValue does not allow repeated fields.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .values = "Array of values. The array may be empty (contain 0 elements).",
+    };
 
     pub const _desc_table = .{
         .values = fd(1, .{ .repeated = .submessage }),
@@ -187,6 +198,14 @@ pub const ArrayValue = struct {
 pub const KeyValueList = struct {
     values: std.ArrayList(KeyValue) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "KeyValueList is a list of KeyValue messages. We need KeyValueList as a message\nsince `oneof` in AnyValue does not allow repeated fields. Everywhere else where we need\na list of KeyValue messages (e.g. in Span) we use `repeated KeyValue` directly to\navoid unnecessary extra wrapping (which slows down the protocol). The 2 approaches\nare semantically equivalent.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .values = "A collection of key/value pairs of key-value pairs. The list may be empty (may\ncontain 0 elements).\nThe keys MUST be unique (it is not allowed to have more than one\nvalue with the same key).",
+    };
+
     pub const _desc_table = .{
         .values = fd(1, .{ .repeated = .submessage }),
     };
@@ -259,6 +278,9 @@ pub const KeyValueList = struct {
 pub const KeyValue = struct {
     key: []const u8 = &.{},
     value: ?AnyValue = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "KeyValue is a key-value pair that is used to store Span attributes, Link\nattributes, etc.";
 
     pub const _desc_table = .{
         .key = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),
@@ -335,6 +357,15 @@ pub const InstrumentationScope = struct {
     version: []const u8 = &.{},
     attributes: std.ArrayList(KeyValue) = .empty,
     dropped_attributes_count: u32 = 0,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "InstrumentationScope is a message representing the instrumentation scope information\nsuch as the fully qualified name and version.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .name = "An empty instrumentation scope name means the name is unknown.",
+        .attributes = "Additional attributes that describe the scope. [Optional].\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+    };
 
     pub const _desc_table = .{
         .name = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),

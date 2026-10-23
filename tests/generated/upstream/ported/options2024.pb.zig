@@ -7,6 +7,9 @@ const fd = protobuf.fd;
 
 /// OptionExtensionFromOptionDependency
 pub const ExtensionFromOptionDependency = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "OptionExtensionFromOptionDependency";
+
     pub const _desc_table = .{};
 
     /// Options of the message (`google.protobuf.MessageOptions`).
@@ -82,6 +85,9 @@ pub const ExtensionFromOptionDependency = struct {
 
 /// MessageOptionThreeFieldsSet
 pub const ThreeFieldsSet = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "MessageOptionThreeFieldsSet";
+
     pub const _desc_table = .{};
 
     /// Options of the message (`google.protobuf.MessageOptions`).
@@ -159,6 +165,9 @@ pub const ThreeFieldsSet = struct {
 
 /// MessageOptionRepeatedLeafFieldSet
 pub const RepeatedLeafFieldSet = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "MessageOptionRepeatedLeafFieldSet";
+
     pub const _desc_table = .{};
 
     /// Options of the message (`google.protobuf.MessageOptions`).
@@ -234,6 +243,9 @@ pub const RepeatedLeafFieldSet = struct {
 
 /// MessageOptionRepeatedMsgFieldSet
 pub const RepeatedMsgFieldSet = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "MessageOptionRepeatedMsgFieldSet";
+
     pub const _desc_table = .{};
 
     /// Options of the message (`google.protobuf.MessageOptions`).

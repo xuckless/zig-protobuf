@@ -12,6 +12,15 @@ pub const Resource = struct {
     attributes: std.ArrayList(opentelemetry_proto_common_v1.KeyValue) = .empty,
     dropped_attributes_count: u32 = 0,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Resource information.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .attributes = "Set of attributes that describe the resource.\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+        .dropped_attributes_count = "dropped_attributes_count is the number of dropped attributes. If the value is 0, then\nno attributes were dropped.",
+    };
+
     pub const _desc_table = .{
         .attributes = fd(1, .{ .repeated = .submessage }),
         .dropped_attributes_count = fd(2, .{ .scalar = .uint32 }),

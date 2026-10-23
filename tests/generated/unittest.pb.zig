@@ -26,6 +26,9 @@ pub const TestEnumWithDupValue = enum(i32) {
         .{ .name = "FOO2", .value = 1 },
         .{ .name = "BAR2", .value = 2 },
     };
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test an enum that has multiple values with the same number.";
 };
 
 /// Test an enum with large, unordered values.
@@ -37,6 +40,9 @@ pub const TestSparseEnum = enum(i32) {
     SPARSE_E = -53452,
     SPARSE_F = 0,
     SPARSE_G = 2,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test an enum with large, unordered values.";
 };
 
 pub const VeryLargeEnum = enum(i32) {
@@ -232,6 +238,18 @@ pub const TestAllTypes = struct {
         };
     };
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "This proto includes every type of field in both singular and repeated\nforms.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .optional_int32 = "Singular",
+        .a = "optional group OptionalGroup = 16 {",
+        .repeated_int32 = "Repeated",
+        .RepeatedGroup_a = "repeated group RepeatedGroup = 46 {",
+        .default_int32 = "Singular with defaults",
+    };
+
     pub const _desc_table = .{
         .optional_int32 = fd(1, .{ .scalar = .int32 }),
         .optional_int64 = fd(2, .{ .scalar = .int64 }),
@@ -333,6 +351,11 @@ pub const TestAllTypes = struct {
 
     pub const NestedMessage = struct {
         bb: ?i32 = null,
+
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _field_docs = .{
+            .bb = "The field name \"b\" fails to compile in proto1 because it conflicts with\na local variable named \"b\" in one of the generated methods.  Doh.\nThis file needs to compile in proto1 to test backwards-compatibility.",
+        };
 
         pub const _desc_table = .{
             .bb = fd(1, .{ .scalar = .int32 }),
@@ -471,6 +494,9 @@ pub const NestedTestAllTypes = struct {
     repeated_child: std.ArrayList(NestedTestAllTypes) = .empty,
     lazy_child: ?*NestedTestAllTypes = null,
     eager_child: ?TestAllTypes = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "This proto includes a recursively nested message.";
 
     pub const _desc_table = .{
         .child = fd(1, .submessage),
@@ -687,6 +713,9 @@ pub const ForeignMessage = struct {
     c: ?i32 = null,
     d: ?i32 = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Define these after TestAllTypes to make sure the compiler can handle\nthat.";
+
     pub const _desc_table = .{
         .c = fd(1, .{ .scalar = .int32 }),
         .d = fd(2, .{ .scalar = .int32 }),
@@ -899,6 +928,12 @@ pub const TestAllExtensions = struct {
 pub const TestGroup = struct {
     a: ?i32 = null,
     optional_foreign_enum: ?ForeignEnum = null,
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .a = "optional group OptionalGroup = 16 {",
+        .optional_foreign_enum = "}",
+    };
 
     pub const _desc_table = .{
         .a = fd(17, .{ .scalar = .int32 }),
@@ -1198,6 +1233,9 @@ pub const TestChildExtensionData = struct {
     b: ?[]const u8 = null,
     optional_extension: ?TestChildExtensionData.NestedTestAllExtensionsData = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Emulates wireformat data of TestChildExtension with dynamic extension\n(DynamicExtension).";
+
     pub const _desc_table = .{
         .a = fd(1, .{ .scalar = .string }),
         .b = fd(2, .{ .scalar = .string }),
@@ -1487,6 +1525,9 @@ pub const TestNestedChildExtensionData = struct {
     a: ?i32 = null,
     child: ?TestChildExtensionData = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Emulates wireformat data of TestNestedChildExtension with dynamic extension\n(DynamicExtension).";
+
     pub const _desc_table = .{
         .a = fd(1, .{ .scalar = .int32 }),
         .child = fd(2, .submessage),
@@ -1595,6 +1636,15 @@ pub const TestRequired = struct {
     dummy32: ?i32 = null,
     c: i32,
     optional_foreign: ?ForeignMessage = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "We have separate messages for testing required fields because it's\nannoying to have to fill in required fields in TestProto in order to\ndo anything with it.  Note that we don't need to test every type of\nrequired filed because the code output is basically identical to\noptional fields for all types.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .dummy4 = "Pad the field count to 32 so that we can test that IsInitialized()\nproperly checks multiple elements of has_bits_.",
+        .optional_foreign = "Add an optional child message to make this non-trivial for go/pdlazy.",
+    };
 
     pub const _desc_table = .{
         .a = fdf(1, .{ .scalar = .int32 }, .{ .legacy_required = true }),
@@ -1705,6 +1755,11 @@ pub const TestRequiredForeign = struct {
     repeated_message: std.ArrayList(TestRequired) = .empty,
     dummy: ?i32 = null,
     optional_lazy_message: ?NestedTestAllTypes = null,
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .optional_lazy_message = "Missing required fields must not affect verification of child messages.",
+    };
 
     pub const _desc_table = .{
         .optional_message = fd(1, .submessage),
@@ -1928,6 +1983,9 @@ pub const TestNestedRequiredForeign = struct {
 pub const TestForeignNested = struct {
     foreign_nested: ?TestAllTypes.NestedMessage = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test that we can use NestedMessage from outside TestAllTypes.";
+
     pub const _desc_table = .{
         .foreign_nested = fd(1, .submessage),
     };
@@ -1997,6 +2055,9 @@ pub const TestForeignNested = struct {
 
 /// TestEmptyMessage is used to test unknown field support.
 pub const TestEmptyMessage = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "TestEmptyMessage is used to test unknown field support.";
+
     pub const _desc_table = .{};
 
     /// Encodes the message to the writer
@@ -2066,6 +2127,9 @@ pub const TestEmptyMessage = struct {
 /// actual extensions should ever be defined for this type.
 pub const TestEmptyMessageWithExtensions = struct {
     _extensions: protobuf.ExtensionSet = .empty,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Like above, but declare all field numbers as potential extensions.  No\nactual extensions should ever be defined for this type.";
 
     pub const _desc_table = .{};
 
@@ -2141,6 +2205,9 @@ pub const TestEmptyMessageWithExtensions = struct {
 
 /// Needed for a Python test.
 pub const TestPickleNestedMessage = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Needed for a Python test.";
+
     pub const _desc_table = .{};
 
     pub const NestedMessage = struct {
@@ -2428,6 +2495,14 @@ pub const TestReallyLargeTagNumber = struct {
     a: ?i32 = null,
     bb: ?i32 = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test that really large tag numbers don't break anything.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .a = "The largest possible tag number is 2^28 - 1, since the wire format uses\nthree bits to communicate wire type.",
+    };
+
     pub const _desc_table = .{
         .a = fd(1, .{ .scalar = .int32 }),
         .bb = fd(268435455, .{ .scalar = .int32 }),
@@ -2573,6 +2648,14 @@ pub const TestMutualRecursionA = struct {
     bb: ?TestMutualRecursionB = null,
     sub_message: ?TestMutualRecursionA.SubMessage = null,
     not_in_this_scc: ?TestAllTypes = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test that mutual recursion works.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .sub_message = "optional group SubGroup = 2 {",
+    };
 
     pub const _desc_table = .{
         .bb = fd(1, .submessage),
@@ -2795,6 +2878,11 @@ pub const TestIsInitialized = struct {
     pub const SubMessage = struct {
         i: i32,
 
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _field_docs = .{
+            .i = "optional group SubGroup = 1 {",
+        };
+
         pub const _desc_table = .{
             .i = fdf(2, .{ .scalar = .int32 }, .{ .legacy_required = true }),
         };
@@ -2932,6 +3020,9 @@ pub const TestIsInitialized = struct {
 pub const TestDupFieldNumber = struct {
     a: ?i32 = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test that groups have disjoint field numbers from their siblings and\nparents.  This is NOT possible in proto1; only google.protobuf.  When\nattempting to compile with proto1, this will emit an error; so we only\ninclude it in protobuf_unittest_proto.";
+
     pub const _desc_table = .{
         .a = fd(1, .{ .scalar = .int32 }),
     };
@@ -3002,6 +3093,9 @@ pub const TestDupFieldNumber = struct {
 /// Additional messages for testing lazy fields.
 pub const TestEagerMessage = struct {
     sub_message: ?TestAllTypes = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Additional messages for testing lazy fields.";
 
     pub const _desc_table = .{
         .sub_message = fd(1, .submessage),
@@ -3288,6 +3382,9 @@ pub const TestEagerMaybeLazy = struct {
 pub const TestNestedMessageHasBits = struct {
     optional_nested_message: ?TestNestedMessageHasBits.NestedMessage = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Needed for a Python test.";
+
     pub const _desc_table = .{
         .optional_nested_message = fd(1, .submessage),
     };
@@ -3443,6 +3540,9 @@ pub const TestCamelCaseFieldNames = struct {
     RepeatedStringPieceField: std.ArrayList([]const u8) = .empty,
     RepeatedCordField: std.ArrayList([]const u8) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test message with CamelCase field names.  This violates Protocol Buffer\nstandard style.";
+
     pub const _desc_table = .{
         .PrimitiveField = fd(1, .{ .scalar = .int32 }),
         .StringField = fd(2, .{ .scalar = .string }),
@@ -3530,6 +3630,9 @@ pub const TestFieldOrderings = struct {
     optional_nested_message: ?TestFieldOrderings.NestedMessage = null,
     _extensions: protobuf.ExtensionSet = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "We list fields out of order, to ensure that we're using field number and not\nfield index to determine serialization order.";
+
     pub const _desc_table = .{
         .my_string = fd(11, .{ .scalar = .string }),
         .my_int = fd(1, .{ .scalar = .int64 }),
@@ -3548,6 +3651,11 @@ pub const TestFieldOrderings = struct {
     pub const NestedMessage = struct {
         oo: ?i64 = null,
         bb: ?i32 = null,
+
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _field_docs = .{
+            .bb = "The field name \"b\" fails to compile in proto1 because it conflicts with\na local variable named \"b\" in one of the generated methods.  Doh.\nThis file needs to compile in proto1 to test backwards-compatibility.",
+        };
 
         pub const _desc_table = .{
             .oo = fd(2, .{ .scalar = .int64 }),
@@ -3925,6 +4033,16 @@ pub const TestExtremeDefaultValues = struct {
     cord_with_zero: ?[]const u8 = null,
     replacement_string: ?[]const u8 = null,
 
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .utf8_string = "The default value here is UTF-8 for \"\\u1234\".  (We could also just type\nthe UTF-8 text directly into this text file rather than escape it, but\nlots of people use editors that would be confused by this.)",
+        .zero_float = "Tests for single-precision floating-point values.",
+        .large_float = "Using exponents",
+        .inf_double = "Text for nonfinite floating-point values.",
+        .cpp_trigraph = "Tests for C++ trigraphs.\nTrigraphs should be escaped in C++ generated files, but they should not be\nescaped for other languages.\nNote that in .proto file, \"\\?\" is a valid way to escape ? in string\nliterals.",
+        .string_with_zero = "String defaults containing the character '\\000'",
+    };
+
     pub const _desc_table = .{
         .escaped_bytes = fd(1, .{ .scalar = .bytes }),
         .large_uint32 = fd(2, .{ .scalar = .uint32 }),
@@ -4122,6 +4240,9 @@ pub const SparseEnumMessage = struct {
 /// Test String and Bytes: string is for valid UTF-8 strings
 pub const OneString = struct {
     data: ?[]const u8 = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test String and Bytes: string is for valid UTF-8 strings";
 
     pub const _desc_table = .{
         .data = fd(1, .{ .scalar = .string }),
@@ -4536,6 +4657,9 @@ pub const ManyOptionalString = struct {
 pub const Int32Message = struct {
     data: ?i32 = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test int32, uint32, int64, uint64, and bool are all compatible";
+
     pub const _desc_table = .{
         .data = fd(1, .{ .scalar = .int32 }),
     };
@@ -4909,6 +5033,14 @@ pub const TestOneof = struct {
         };
     };
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test oneofs.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .a = "group FooGroup = 4 {",
+    };
+
     pub const _desc_table = .{
         .foo = fd(null, .{ .oneof = foo_union }),
     };
@@ -4982,6 +5114,11 @@ pub const TestOneofBackwardsCompatible = struct {
     foo_message: ?TestAllTypes = null,
     a: ?i32 = null,
     b: ?[]const u8 = null,
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .a = "optional group FooGroup = 4 {",
+    };
 
     pub const _desc_table = .{
         .foo_int = fd(1, .{ .scalar = .int32 }),
@@ -5132,6 +5269,12 @@ pub const TestOneof2 = struct {
             .bar_string_piece_with_empty_default = fd(22, .{ .scalar = .string }),
             .bar_bytes_with_empty_default = fd(23, .{ .scalar = .bytes }),
         };
+    };
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .a = "group FooGroup = 8 {",
+        .foo_lazy_message = "}",
     };
 
     pub const _desc_table = .{
@@ -5567,6 +5710,9 @@ pub const TestUnpackedTypes = struct {
     unpacked_bool: std.ArrayList(bool) = .empty,
     unpacked_enum: std.ArrayList(ForeignEnum) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A message with the same fields as TestPackedTypes, but without packing. Used\nto test packed <-> unpacked wire compatibility.";
+
     pub const _desc_table = .{
         .unpacked_int32 = fd(90, .{ .repeated = .{ .scalar = .int32 } }),
         .unpacked_int64 = fd(91, .{ .repeated = .{ .scalar = .int64 } }),
@@ -5809,6 +5955,9 @@ pub const TestDynamicExtensions = struct {
     repeated_extension: std.ArrayList([]const u8) = .empty,
     packed_extension: std.ArrayList(i32) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Used by ExtensionSetTest/DynamicExtensions.  The test actually builds\na set of extensions to TestAllExtensions dynamically, based on the fields\nof this message type.";
+
     pub const _desc_table = .{
         .scalar_extension = fd(2000, .{ .scalar = .fixed32 }),
         .enum_extension = fd(2001, .@"enum"),
@@ -5966,6 +6115,14 @@ pub const TestRepeatedScalarDifferentTagSizes = struct {
     repeated_float: std.ArrayList(f32) = .empty,
     repeated_uint64: std.ArrayList(u64) = .empty,
 
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .repeated_fixed32 = "Parsing repeated fixed size values used to fail. This message needs to be\nused in order to get a tag of the right size; all of the repeated fields\nin TestAllTypes didn't trigger the check.",
+        .repeated_int32 = "Check for a varint type, just for good measure.",
+        .repeated_fixed64 = "These have two-byte tags.",
+        .repeated_float = "Three byte tags.",
+    };
+
     pub const _desc_table = .{
         .repeated_fixed32 = fd(12, .{ .repeated = .{ .scalar = .fixed32 } }),
         .repeated_int32 = fd(13, .{ .repeated = .{ .scalar = .int32 } }),
@@ -6048,6 +6205,15 @@ pub const TestParsingMerge = struct {
     repeated_group_all_types: ?TestAllTypes = null,
     _extensions: protobuf.ExtensionSet = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test that if an optional or required message/group field appears multiple\ntimes in the input, they need to be merged.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .optional_group_all_types = "optional group OptionalGroup = 10 {",
+        .repeated_group_all_types = "}\nrepeated group RepeatedGroup = 20 {",
+    };
+
     pub const _desc_table = .{
         .required_all_types = fdf(1, .submessage, .{ .legacy_required = true }),
         .optional_all_types = fd(2, .submessage),
@@ -6076,6 +6242,16 @@ pub const TestParsingMerge = struct {
         Group2_field1: ?TestAllTypes = null,
         ext1: std.ArrayList(TestAllTypes) = .empty,
         ext2: std.ArrayList(TestAllTypes) = .empty,
+
+        /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+        pub const _doc = "RepeatedFieldsGenerator defines matching field types as TestParsingMerge,\nexcept that all fields are repeated. In the tests, we will serialize the\nRepeatedFieldsGenerator to bytes, and parse the bytes to TestParsingMerge.\nRepeated fields in RepeatedFieldsGenerator are expected to be merged into\nthe corresponding required/optional fields in TestParsingMerge.";
+
+        /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+        pub const _field_docs = .{
+            .Group1_field1 = "repeated group Group1 = 10 {",
+            .Group2_field1 = "}\nrepeated group Group2 = 20 {",
+            .ext1 = "}",
+        };
 
         pub const _desc_table = .{
             .field1 = fd(1, .{ .repeated = .submessage }),
@@ -6222,6 +6398,9 @@ pub const TestParsingMerge = struct {
 pub const TestMergeException = struct {
     all_extensions: ?TestAllExtensions = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test that the correct exception is thrown by parseFrom in a corner case\ninvolving merging, extensions, and required fields.";
+
     pub const _desc_table = .{
         .all_extensions = fd(1, .submessage),
     };
@@ -6291,6 +6470,11 @@ pub const TestMergeException = struct {
 
 pub const TestCommentInjectionMessage = struct {
     a: ?[]const u8 = null,
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .a = "*/ <- This should not close the generated doc comment",
+    };
 
     pub const _desc_table = .{
         .a = fd(1, .{ .scalar = .string }),
@@ -6374,6 +6558,9 @@ pub const TestMessageSize = struct {
     m5: ?i32 = null,
     m6: ?i64 = null,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Used to check that the c++ code generator re-orders messages to reduce\npadding.";
+
     pub const _desc_table = .{
         .m1 = fd(1, .{ .scalar = .bool }),
         .m2 = fd(2, .{ .scalar = .int64 }),
@@ -6448,6 +6635,9 @@ pub const TestMessageSize = struct {
 
 /// Test that RPC services work.
 pub const FooRequest = struct {
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Test that RPC services work.";
+
     pub const _desc_table = .{};
 
     /// Encodes the message to the writer
@@ -6956,6 +7146,11 @@ pub const TestHugeFieldNumbers = struct {
             .oneof_string = fd(536870013, .{ .scalar = .string }),
             .oneof_bytes = fd(536870014, .{ .scalar = .bytes }),
         };
+    };
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .group_a = "optional group OptionalGroup = 536870008 {",
     };
 
     pub const _desc_table = .{
@@ -8391,6 +8586,14 @@ pub const EnumParseTester = struct {
     packed_arbitrary_midfield: std.ArrayList(EnumParseTester.Arbitrary) = .empty,
     packed_arbitrary_hifield: std.ArrayList(EnumParseTester.Arbitrary) = .empty,
     other_field: ?i32 = null,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "This message contains different kind of enums to exercise the different\nparsers in table-driven.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .other_field = "An arbitrary field we can append to to break the runs of repeated fields.",
+    };
 
     pub const _desc_table = .{
         .optional_seq_small_0_lowfield = fd(1, .@"enum"),

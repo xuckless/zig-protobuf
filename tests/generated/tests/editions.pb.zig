@@ -30,6 +30,9 @@ pub const ClosedZeroSecond = enum(i32) {
     CZS_ONE = 1,
     CZS_ZERO = 0,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Closed enum whose zero value is not its first value, and so not its default.";
+
     /// Options of the enum (`google.protobuf.EnumOptions`).
     pub const _options = .{
         .@"#raw" = ":\x02\x10\x02",
@@ -129,6 +132,11 @@ pub const Delimited = struct {
             .oneof_child = fdf(4, .submessage, .{ .message_encoding = .delimited }),
             .oneof_int = fd(5, .{ .scalar = .int32 }),
         };
+    };
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .by_name = "Map entries are always length-prefixed, whatever the file features.",
     };
 
     pub const _desc_table = .{
@@ -298,6 +306,11 @@ pub const Presence = struct {
     closed_enum: ?Closed = null,
     open_enum: ?Open = null,
     closed_enums: std.ArrayList(Closed) = .empty,
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .explicit_int = "Explicit presence is the default in edition 2023.",
+    };
 
     pub const _desc_table = .{
         .explicit_int = fd(1, .{ .scalar = .int32 }),

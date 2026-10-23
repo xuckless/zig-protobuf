@@ -38,6 +38,14 @@ pub const SeverityNumber = enum(i32) {
     SEVERITY_NUMBER_FATAL3 = 23,
     SEVERITY_NUMBER_FATAL4 = 24,
     _,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Possible values for LogRecord.SeverityNumber.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _value_docs = .{
+        .SEVERITY_NUMBER_UNSPECIFIED = "UNSPECIFIED is the default SeverityNumber, it MUST NOT be used.",
+    };
 };
 
 /// LogRecordFlags represents constants used to interpret the
@@ -51,6 +59,15 @@ pub const LogRecordFlags = enum(i32) {
     LOG_RECORD_FLAGS_DO_NOT_USE = 0,
     LOG_RECORD_FLAGS_TRACE_FLAGS_MASK = 255,
     _,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "LogRecordFlags represents constants used to interpret the\nLogRecord.flags field, which is protobuf 'fixed32' type and is to\nbe used as bit-fields. Each non-zero value defined in this enum is\na bit-mask.  To extract the bit-field, for example, use an\nexpression like:\n\n(logRecord.flags & LOG_RECORD_FLAGS_TRACE_FLAGS_MASK)";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _value_docs = .{
+        .LOG_RECORD_FLAGS_DO_NOT_USE = "The zero value for the enum. Should not be used for comparisons.\nInstead use bitwise \"and\" with the appropriate mask as shown above.",
+        .LOG_RECORD_FLAGS_TRACE_FLAGS_MASK = "Bits 0-7 are used for trace flags.",
+    };
 };
 
 /// LogsData represents the logs data that can be stored in a persistent storage,
@@ -65,6 +82,14 @@ pub const LogRecordFlags = enum(i32) {
 /// as well.
 pub const LogsData = struct {
     resource_logs: std.ArrayList(ResourceLogs) = .empty,
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "LogsData represents the logs data that can be stored in a persistent storage,\nOR can be embedded by other protocols that transfer OTLP logs data but do not\nimplement the OTLP protocol.\n\nThe main difference between this message and collector protocol is that\nin this message there will not be any \"control\" or \"metadata\" specific to\nOTLP protocol.\n\nWhen new fields are added into this message, the OTLP request MUST be updated\nas well.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .resource_logs = "An array of ResourceLogs.\nFor data coming from a single resource this array will typically contain\none element. Intermediary nodes that receive data from multiple origins\ntypically batch the data before forwarding further and in that case this\narray will contain multiple elements.",
+    };
 
     pub const _desc_table = .{
         .resource_logs = fd(1, .{ .repeated = .submessage }),
@@ -138,6 +163,16 @@ pub const ResourceLogs = struct {
     resource: ?opentelemetry_proto_resource_v1.Resource = null,
     scope_logs: std.ArrayList(ScopeLogs) = .empty,
     schema_url: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A collection of ScopeLogs from a Resource.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .resource = "The resource for the logs in this message.\nIf this field is not set then resource info is unknown.",
+        .scope_logs = "A list of ScopeLogs that originate from a resource.",
+        .schema_url = "The Schema URL, if known. This is the identifier of the Schema that the resource data\nis recorded in. To learn more about Schema URL see\nhttps://opentelemetry.io/docs/specs/otel/schemas/#schema-url\nThis schema_url applies to the data in the \"resource\" field. It does not apply\nto the data in the \"scope_logs\" field which have their own schema_url field.",
+    };
 
     pub const _desc_table = .{
         .resource = fd(1, .submessage),
@@ -213,6 +248,16 @@ pub const ScopeLogs = struct {
     scope: ?opentelemetry_proto_common_v1.InstrumentationScope = null,
     log_records: std.ArrayList(LogRecord) = .empty,
     schema_url: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A collection of Logs produced by a Scope.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .scope = "The instrumentation scope information for the logs in this message.\nSemantically when InstrumentationScope isn't set, it is equivalent with\nan empty instrumentation scope name (unknown).",
+        .log_records = "A list of log records.",
+        .schema_url = "The Schema URL, if known. This is the identifier of the Schema that the log data\nis recorded in. To learn more about Schema URL see\nhttps://opentelemetry.io/docs/specs/otel/schemas/#schema-url\nThis schema_url applies to all logs in the \"logs\" field.",
+    };
 
     pub const _desc_table = .{
         .scope = fd(1, .submessage),
@@ -296,6 +341,22 @@ pub const LogRecord = struct {
     flags: u32 = 0,
     trace_id: []const u8 = &.{},
     span_id: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A log record according to OpenTelemetry Log Data Model:\nhttps://github.com/open-telemetry/oteps/blob/main/text/logs/0097-log-data-model.md";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .time_unix_nano = "time_unix_nano is the time when the event occurred.\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.\nValue of 0 indicates unknown or missing timestamp.",
+        .observed_time_unix_nano = "Time when the event was observed by the collection system.\nFor events that originate in OpenTelemetry (e.g. using OpenTelemetry Logging SDK)\nthis timestamp is typically set at the generation time and is equal to Timestamp.\nFor events originating externally and collected by OpenTelemetry (e.g. using\nCollector) this is the time when OpenTelemetry's code observed the event measured\nby the clock of the OpenTelemetry code. This field MUST be set once the event is\nobserved by OpenTelemetry.\n\nFor converting OpenTelemetry log data to formats that support only one timestamp or\nwhen receiving OpenTelemetry log data by recipients that support only one timestamp\ninternally the following logic is recommended:\n- Use time_unix_nano if it is present, otherwise use observed_time_unix_nano.\n\nValue is UNIX Epoch time in nanoseconds since 00:00:00 UTC on 1 January 1970.\nValue of 0 indicates unknown or missing timestamp.",
+        .severity_number = "Numerical value of the severity, normalized to values described in Log Data Model.\n[Optional].",
+        .severity_text = "The severity text (also known as log level). The original string representation as\nit is known at the source. [Optional].",
+        .body = "A value containing the body of the log record. Can be for example a human-readable\nstring message (including multi-line) describing the event in a free form or it can\nbe a structured data composed of arrays and maps of other values. [Optional].",
+        .attributes = "Additional attributes that describe the specific event occurrence. [Optional].\nAttribute keys MUST be unique (it is not allowed to have more than one\nattribute with the same key).",
+        .flags = "Flags, a bit field. 8 least significant bits are the trace flags as\ndefined in W3C Trace Context specification. 24 most significant bits are reserved\nand must be set to 0. Readers must not assume that 24 most significant bits\nwill be zero and must correctly mask the bits when reading 8-bit trace flag (use\nflags & LOG_RECORD_FLAGS_TRACE_FLAGS_MASK). [Optional].",
+        .trace_id = "A unique identifier for a trace. All logs from the same trace share\nthe same `trace_id`. The ID is a 16-byte array. An ID with all zeroes OR\nof length other than 16 bytes is considered invalid (empty string in OTLP/JSON\nis zero-length and thus is also invalid).\n\nThis field is optional.\n\nThe receivers SHOULD assume that the log record is not associated with a\ntrace if any of the following is true:\n- the field is not present,\n- the field contains an invalid value.",
+        .span_id = "A unique identifier for a span within a trace, assigned when the span\nis created. The ID is an 8-byte array. An ID with all zeroes OR of length\nother than 8 bytes is considered invalid (empty string in OTLP/JSON\nis zero-length and thus is also invalid).\n\nThis field is optional. If the sender specifies a valid span_id then it SHOULD also\nspecify a valid trace_id.\n\nThe receivers SHOULD assume that the log record is not associated with a\nspan if any of the following is true:\n- the field is not present,\n- the field contains an invalid value.",
+    };
 
     pub const _desc_table = .{
         .time_unix_nano = fd(1, .{ .scalar = .fixed64 }),

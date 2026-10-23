@@ -203,6 +203,20 @@ pub const TestAllTypesProto3 = struct {
         };
     };
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "This proto includes every type of field in both singular and repeated\nforms.\n\nAlso, crucially, all messages and enums in this file are eventually\nsubmessages of this message.  So for example, a fuzz test of TestAllTypes\ncould trigger bugs that occur in any message type in this file.  We verify\nthis stays true in a unit test.";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .optional_int32 = "Singular",
+        .repeated_int32 = "Repeated",
+        .packed_int32 = "Packed",
+        .unpacked_int32 = "Unpacked",
+        .map_int32_int32 = "Map",
+        .optional_bool_wrapper = "Well-known types",
+        .fieldname1 = "Test field-name-to-JSON-name convention.\n(protobuf says names can be any valid C/C++ identifier.)",
+    };
+
     pub const _desc_table = .{
         .optional_int32 = fd(1, .{ .scalar = .int32 }),
         .optional_int64 = fd(2, .{ .scalar = .int64 }),

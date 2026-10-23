@@ -234,6 +234,9 @@ pub const Simple2 = struct {
     a_string: []const u8,
     a_repeated_string: std.ArrayList([]const u8) = .empty,
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "A message that differs from Simple1 only by name";
+
     pub const _desc_table = .{
         .a_string = fdf(1, .{ .scalar = .string }, .{ .legacy_required = true }),
         .a_repeated_string = fd(2, .{ .repeated = .{ .scalar = .string } }),
@@ -307,6 +310,11 @@ pub const SpecialCases = struct {
     default: []const u8,
     function: []const u8,
     @"var": []const u8,
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .default = "Examples of Js reserved names that are converted to pb_<name>.",
+    };
 
     pub const _desc_table = .{
         .normal = fdf(1, .{ .scalar = .string }, .{ .legacy_required = true }),
@@ -1251,6 +1259,11 @@ pub const TestGroup = struct {
     id: ?[]const u8 = null,
     required_simple: ?Simple2 = null,
     optional_simple: ?Simple2 = null,
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .id = "repeated group RepeatedGroup = 1 {\nrequired string id = 1;\nrepeated bool some_bool = 2;\n}\nrequired group RequiredGroup = 2 {\nrequired string id = 1;\n}\noptional group OptionalGroup = 3 {\nrequired string id = 1;\n}\noptional group MessageInGroup = 4 {\nmessage NestedMessage {\noptional string id = 1;\n}\nrequired NestedMessage id = 1;\n}\noptional group EnumInGroup = 5 {\nenum NestedEnum {\nfirst = 0;\nsecond = 1;\n}\nrequired NestedEnum id = 1;\n}",
+    };
 
     pub const _desc_table = .{
         .id = fd(6, .{ .scalar = .string }),

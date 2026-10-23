@@ -197,6 +197,9 @@ pub const WithEnum = struct {
 pub const WithEnumShadow = struct {
     value: WithEnumShadow.SomeEnum = @fromBackingInt(0),
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "tests shadowing names";
+
     pub const _desc_table = .{
         .value = fd(1, .@"enum"),
     };
@@ -1069,6 +1072,15 @@ pub const ComplexType = struct {
     field_108: []const u8 = &.{},
     field_109: []const u8 = &.{},
     field_110: []const u8 = &.{},
+
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "This message simulates complex Kubernetes-like types with many fields\nto test the compile-time evaluation branch quota issue and\nthe to_camel_case constant mutation issue";
+
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .APIVersion = "Fields with uppercase first letters to test to_camel_case fix",
+        .field_3 = "Many fields to exceed 1000 backwards branches during compile-time evaluation",
+    };
 
     pub const _desc_table = .{
         .APIVersion = fdf(1, .{ .scalar = .string }, .{ .utf8_validation = .verify }),

@@ -329,6 +329,9 @@ pub const TwoOneofs = struct {
         };
     };
 
+    /// Comment of the declaration in the .proto file, for tools (OpenAPI).
+    pub const _doc = "Messages with two oneofs.";
+
     pub const _desc_table = .{
         .first = fd(null, .{ .oneof = first_union }),
         .second = fd(null, .{ .oneof = second_union }),

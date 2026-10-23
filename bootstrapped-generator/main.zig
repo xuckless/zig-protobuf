@@ -88,6 +88,82 @@ const GenerationContext = struct {
             }
         }
 
+        /// The leading comment of the element at `path`, as plain text (lines
+        /// joined with "\n", comment markers stripped), or null if none.
+        fn commentAtPath(allocator: std.mem.Allocator, file: descriptor.FileDescriptorProto, path: []const i32) !?[]const u8 {
+            const sci = file.source_code_info orelse return null;
+            for (sci.location.items) |location| {
+                if (!std.mem.eql(i32, location.path.items, path)) continue;
+                const raw = location.leading_comments orelse return null;
+                var trimmed = raw;
+                while (trimmed.len > 0 and trimmed[trimmed.len - 1] == '\n') trimmed = trimmed[0 .. trimmed.len - 1];
+                var out: std.ArrayList(u8) = .empty;
+                var it = std.mem.splitScalar(u8, trimmed, '\n');
+                var first = true;
+                while (it.next()) |comment_line| {
+                    var line = comment_line;
+                    while (line.len > 0 and (line[0] == '/' or line[0] == ' ')) line = line[1..];
+                    if (!first) try out.append(allocator, '\n');
+                    first = false;
+                    try out.appendSlice(allocator, line);
+                }
+                const text = std.mem.trim(u8, out.items, " \n");
+                if (text.len == 0) return null;
+                return try allocator.dupe(u8, text);
+            }
+            return null;
+        }
+
+        /// `path` plus two more elements.
+        fn childPath(allocator: std.mem.Allocator, path: []const i32, a: i32, b: usize) ![]const i32 {
+            const out = try allocator.alloc(i32, path.len + 2);
+            @memcpy(out[0..path.len], path);
+            out[path.len] = a;
+            out[path.len + 1] = @intCast(b);
+            return out;
+        }
+
+        /// Emits `    pub const _doc = "...";` when the element at `path` has a comment.
+        fn emitDoc(allocator: std.mem.Allocator, lines: *std.ArrayList([]const u8), file: descriptor.FileDescriptorProto, path: []const i32) !void {
+            const text = try commentAtPath(allocator, file, path) orelse return;
+            try lines.append(allocator, try std.fmt.allocPrint(
+                allocator,
+                "\n    /// Comment of the declaration in the .proto file, for tools (OpenAPI).\n    pub const _doc = \"{f}\";\n",
+                .{std.zig.fmtString(text)},
+            ));
+        }
+
+        /// Emits `    pub const <decl> = .{ .<name> = "...", ... };` for the children
+        /// (`child_field` of the element at `path`) that have a comment.
+        fn emitDocTable(
+            allocator: std.mem.Allocator,
+            lines: *std.ArrayList([]const u8),
+            file: descriptor.FileDescriptorProto,
+            path: []const i32,
+            child_field: i32,
+            decl: []const u8,
+            items: anytype,
+        ) !void {
+            var emitted = false;
+            for (items, 0..) |item, i| {
+                const text = try commentAtPath(allocator, file, try childPath(allocator, path, child_field, i)) orelse continue;
+                if (!emitted) {
+                    try lines.append(allocator, try std.fmt.allocPrint(
+                        allocator,
+                        "\n    /// Comments of the declarations in the .proto file, for tools (OpenAPI).\n    pub const {s} = .{{\n",
+                        .{decl},
+                    ));
+                    emitted = true;
+                }
+                try lines.append(allocator, try std.fmt.allocPrint(
+                    allocator,
+                    "        .{f} = \"{f}\",\n",
+                    .{ std.zig.fmtId(item.name.?), std.zig.fmtString(text) },
+                ));
+            }
+            if (emitted) try lines.append(allocator, "    };\n");
+        }
+
         /// Get source code location for an item in a repeated field
         fn getRepeatedFieldLocation(
             file: descriptor.FileDescriptorProto,
@@ -583,6 +659,11 @@ const GenerationContext = struct {
                     \\    };
                     \\
                 );
+            }
+            {
+                const enum_path = try SourceCodeInfo.childPath(allocator, root_path, enum_field_number, enum_i);
+                try SourceCodeInfo.emitDoc(allocator, lines, file, enum_path);
+                try SourceCodeInfo.emitDocTable(allocator, lines, file, enum_path, 2, "_value_docs", e.value.items);
             }
             try ctx.generateEnumOptions(allocator, lines, file, e);
             try lines.append(allocator, "};\n\n");
@@ -1114,6 +1195,9 @@ const GenerationContext = struct {
                     );
                 }
             }
+
+            try SourceCodeInfo.emitDoc(allocator, lines, file, message_path.items);
+            try SourceCodeInfo.emitDocTable(allocator, lines, file, message_path.items, 2, "_field_docs", m.field.items);
 
             // field descriptors
             try lines.append(allocator,
@@ -2052,6 +2136,11 @@ const GenerationContext = struct {
                     .{service_name},
                 ),
             );
+            {
+                const service_path = try SourceCodeInfo.childPath(allocator, root_path, service_field_number, service_i);
+                try SourceCodeInfo.emitDoc(allocator, lines, file, service_path);
+                try SourceCodeInfo.emitDocTable(allocator, lines, file, service_path, 2, "_method_docs", service.method.items);
+            }
             try self.generateServiceOptions(allocator, lines, file, service);
 
             // Generate vtable fields (function pointers only)

@@ -1196,6 +1196,11 @@ pub const GraphicsDB = struct {
     scripts: std.ArrayList(Script) = .empty,
     spine: std.ArrayList(Spine) = .empty,
 
+    /// Comments of the declarations in the .proto file, for tools (OpenAPI).
+    pub const _field_docs = .{
+        .bodies = "repeated Tileset tilesets = 3;",
+    };
+
     pub const _desc_table = .{
         .textures = fd(1, .{ .repeated = .submessage }),
         .graphics = fd(2, .{ .repeated = .submessage }),
